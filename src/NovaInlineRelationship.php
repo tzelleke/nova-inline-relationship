@@ -173,11 +173,11 @@ class NovaInlineRelationship extends Field
      */
     public function getPropertiesWithMetaForForms($resource, $attribute): Collection
     {
-        $fields = $this->getFieldsFromResource($resource, $attribute)
-            ->filter->authorize(app(NovaRequest::class))
-            ->filter(function ($field) {
-                $request = app(NovaRequest::class);
+        $request = app(NovaRequest::class);
 
+        $fields = $this->getFieldsFromResource($resource, $attribute)
+            ->filter->authorize($request)
+            ->filter(function ($field) use ($request) {
                 return ($request->isCreateOrAttachRequest() && $field->showOnCreation)
                     || ($request->isUpdateOrUpdateAttachedRequest() && $field->showOnUpdate);
             });
@@ -405,7 +405,7 @@ class NovaInlineRelationship extends Field
 
         $properties->each(function ($child, $childAttribute) use ($attribute, &$ruleArray, &$messageArray, &$attribArray) {
             if (! empty($child['rules'])) {
-                $name = "{$attribute}.*.{$childAttribute}";
+                $name = "{$attribute}.*.values.{$childAttribute}";
                 $ruleArray[$name] = $child['rules'];
                 $attribArray[$name] = $child['label'] ?? $childAttribute;
 
@@ -450,7 +450,7 @@ class NovaInlineRelationship extends Field
             ? new $this->resourceClass($model)
             : Nova::newResourceFromModel($model->{$attribute}()->getRelated());
 
-        return collect($resource->availableFields(app(NovaRequest::class)))
+        return collect($resource->availableFields(app(NovaInlineRelationshipRequest::class)))
             ->reject(function ($field) use ($resource) {
                 return $field instanceof ListableField ||
                     $field instanceof ResourceToolElement ||
@@ -465,6 +465,7 @@ class NovaInlineRelationship extends Field
      * Get properties for each field.
      *
      * @param Collection $fields
+     * @param NovaRequest $request
      *
      * @return Collection
      */
@@ -474,7 +475,7 @@ class NovaInlineRelationship extends Field
             return [
                 'component' => get_class($value),
                 'label' => $value->name,
-                'options' => $value->meta,
+                'options' => $value->jsonSerialize(),
                 'rules' => $value->rules,
                 'attribute' => $value->attribute,
             ];
