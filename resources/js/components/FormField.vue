@@ -1,47 +1,39 @@
 <template>
-  <default-field
-    :field="field"
-    :errors="errors"
-    :show-errors="false"
-    :full-width-content="true"
-  >
-    <template slot="field">
-      <draggable
-        v-model="items"
-        handle=".relationship-item-handle"
-        :disabled="! field.sortable"
-        @start="drag=true"
-        @end="drag=false"
-      >
-        <relationship-form-item
-          v-for="(items, index) in items"
-          :ref="index"
-          :key="items.id"
-          :id="index"
-          :model-id="items.modelId"
-          :model-key="field.modelKey"
-          :value="items.fields"
-          :errors="errorList"
-          :field="field"
-          @deleted="removeItem(index)"
-        />
-      </draggable>
-      <div
-        v-if="!field.singular || !items.length"
-        class="bg-30 flex p-2 border-b border-40 rounded-lg"
-      >
-        <div class="w-full text-right">
-          <button
-            type="button"
-            class="btn btn-default bg-transparent hover:bg-primary text-primary hover:text-white border border-primary hover:border-transparent inline-flex items-center relative mr-3"
-            @click="addItem()"
-          >
-            Add new {{ field.singularLabel.toLowerCase() }}
-          </button>
-        </div>
+  <div>
+    <field-wrapper>
+      <div :class="[
+          'bg-20',
+          'remove-last-margin-bottom',
+          'leading-normal',
+          'w-full',
+          'py-4',
+          'px-8',
+          ]">
+        <p>{{ field.indexName }}</p>
       </div>
-    </template>
-  </default-field>
+    </field-wrapper>
+
+    <draggable
+      v-model="items"
+      handle=".relationship-item-handle"
+      :disabled="! field.sortable"
+      @start="drag=true"
+      @end="drag=false"
+    >
+      <relationship-form-item
+        v-for="(items, index) in items"
+        :ref="index"
+        :key="items.id"
+        :id="index"
+        :model-id="items.modelId"
+        :model-key="field.modelKey"
+        :value="items.fields"
+        :errors="errorList"
+        :field="field"
+        @deleted="removeItem(index)"
+      />
+    </draggable>
+  </div>
 </template>
 
 <script>
