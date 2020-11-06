@@ -39,7 +39,8 @@
                                 },
                                 ...this.value[attrib].meta,
                                 ...{
-                                    'attribute': (this.value[attrib].meta.component === "file-field") ?
+                                    'attribute': attrib,
+                                    'attribute_': (this.value[attrib].meta.component === "file-field") ?
                                         attrib + '?' + this.id :
                                         this.field.attribute + '_' + this.id + '_' + attrib, // This is needed to enable delete link for file without triggering duplicate id warning
                                     'name': this.value[attrib].meta.singularLabel,
@@ -70,7 +71,7 @@
                                 formData.append(item[0].field.attrib, String(item[0].value))
                             }
                         } else if (item[0].field.component === 'boolean-field') {
-                            formData.append(item[0].field.attribute, item[0].trueValue);
+                            formData.append(item[0].field.attribute_, item[0].trueValue);
                         } else {
                             item[0].fill(formData);
                         }
@@ -82,17 +83,7 @@
             	formData.append(`${parentAttrib}[${this.id}][modelId]`, this.modelId);
                 this.getValueFromChildren().forEach(
                     (value, key) => {
-                        let keyParts = key.split('_');
-
-                        if (keyParts.length === 1) {
-                            formData.append(`${parentAttrib}[${this.id}][values][${key}]`, value);
-                            return;
-                        }
-
-                        let parentParts = parentAttrib.split('_');
-                        let attrib = keyParts.slice(parentParts.length + 1).join('_');
-
-                        formData.append(`${parentAttrib}[${this.id}][values][${attrib}]`, value);
+                        formData.append(`${parentAttrib}[${this.id}][values][${key}]`, value);
                     }
                 );
             },
