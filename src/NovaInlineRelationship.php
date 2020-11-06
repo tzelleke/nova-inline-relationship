@@ -527,9 +527,9 @@ class NovaInlineRelationship extends Field
                     $newRequest = $this->getDuplicateRequest($request, $item);
 
                     return $this->getValueFromField($field, $newRequest, $key)
-                        ?? ($field instanceof File) && ! empty($value)
+                        ?? ($field instanceof File && ! empty($value)
                             ? $value
-                            : null;
+                            : null);
                 }
 
                 return $value;
